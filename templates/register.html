@@ -1,0 +1,156 @@
+<!-- HTML Markup for the Register and Login Forms -->
+<link rel="stylesheet" href="../style/register.css">
+<link rel="stylesheet" href="../style/navbar.css">
+
+<nav class="navbar">
+    <div class="left-side">
+      <span class="logo">Wanderstay</span>
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search...">
+        <button onclick="performSearch()">Search</button>
+      </div>
+      
+    </div>
+    <div class="right-side">
+      <ul class="nav-links">
+        <li><a href="./index.html">Home</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Hosts</a></li>
+        <li><a href="./register.html">Login</a></li>
+        <li><a href="./register.html">Signup</a></li>
+      </ul>
+    </div>
+  </nav>
+
+<center>
+<div id="registerFormContainer" style="margin-top: 10%;">
+    <h2>Register</h2>
+    <form id="registerForm">
+      <label for="guestName">Name:</label>
+      <input type="text" id="guestName" name="guest_name" required /><br><br>
+      <label for="guestEmail">Email:</label>
+      <input type="email" id="guestEmail" name="guest_email" required /><br><br>
+      <label for="guestPassword">Password:</label>
+      <input type="password" id="guestPassword" name="guest_password" required /><br><br>
+      <button type="submit" id="btn">Register</button>
+    </form>
+    <p>Already have an account? <a href="#" id="loginLink">Login</a></p>
+  </div>
+  
+  <div id="loginFormContainer" style="display: none; margin-top: 10%;" >
+    <h2>Login</h2>
+    <form id="loginForm">
+      <label for="loginEmail">Email:</label>
+      <input type="email" id="loginEmail" name="guest_email" required /><br><br>
+      <label for="loginPassword">Password:</label>
+      <input type="password" id="loginPassword" name="guest_password" required /><br><br>
+      <button type="submit" id="btn">Login</button>
+    </form>
+    <p>Don't have an account? <a href="#" id="registerLink">Register</a></p>
+  </div>
+</center>
+  <!-- JavaScript Code -->
+  <script>
+    // Function to switch between Register and Login forms
+    function showRegisterForm() {
+      document.getElementById('registerFormContainer').style.display = 'block';
+      document.getElementById('loginFormContainer').style.display = 'none';
+    }
+  
+    function showLoginForm() {
+      document.getElementById('registerFormContainer').style.display = 'none';
+      document.getElementById('loginFormContainer').style.display = 'block';
+    }
+  
+    // Add event listeners to the "Register" and "Login" links to switch forms
+    const registerLink = document.getElementById('registerLink');
+    registerLink.addEventListener('click', showRegisterForm);
+  
+    const loginLink = document.getElementById('loginLink');
+    loginLink.addEventListener('click', showLoginForm);
+  
+    // Function to handle form submission for user registration
+    function handleRegisterFormSubmit(event) {
+      event.preventDefault();
+  
+      // Get form data
+      const formData = new FormData(document.getElementById('registerForm'));
+      const guestData = {
+        guest_name: formData.get('guest_name'),
+        guest_email: formData.get('guest_email'),
+        guest_password: formData.get('guest_password')
+      };
+  
+      // Send a fetch request to register the guest
+      fetch('http://127.0.0.1:5000/guests/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(guestData)
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // Check if the registration was successful
+          if (data.message === 'Guest registered successfully!') {
+            alert('Registration successful! Please log in to continue.');
+            // After successful registration, switch to the login form
+            showLoginForm();
+          } else {
+            // If there's an issue with the registration, display an error message
+            alert('Error: ' + data.error);
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          // If there's an error with the fetch request, display an error message
+          alert('Error registering guest. Please try again later.');
+        });
+    }
+  
+    // Add event listener to the form submission for user registration
+    const registerForm = document.getElementById('registerForm');
+    registerForm.addEventListener('submit', handleRegisterFormSubmit);
+  
+    // Function to handle form submission for user login
+    function handleLoginFormSubmit(event) {
+      event.preventDefault();
+  
+      // Get form data
+      const formData = new FormData(document.getElementById('loginForm'));
+      const guestData = {
+        guest_email: formData.get('guest_email'),
+        guest_password: formData.get('guest_password')
+      };
+  
+      // Send a fetch request to log in the guest
+      fetch('http://127.0.0.1:5000/guests/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(guestData)
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // Check if the login was successful
+          if (data.message === 'Login successful!') {
+            alert('Login successful!'); // Replace this with your desired login behavior
+            window.location.href="./index.html"
+          } else {
+            // If there's an issue with the login, display an error message
+            alert('Error: ' + data.message);
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          // If there's an error with the fetch request, display an error message
+          alert('Error logging in. Please try again later.');
+        });
+    }
+  
+    // Add event listener to the form submission for user login
+    const loginForm = document.getElementById('loginForm');
+    loginForm.addEventListener('submit', handleLoginFormSubmit);
+  </script>
+  

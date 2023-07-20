@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../style/navbar.css">
+    <link rel="stylesheet" type="text/css" href="../style/property.css">
+    <title>Document</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="left-side">
+          <span class="logo">Wanderstay</span>
+          <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search...">
+            <button onclick="performSearch()">Search</button>
+          </div>
+          
+        </div>
+        <div class="right-side">
+            <ul class="nav-links">
+              <li><a href="#" id="addPropertyBtn" style="background-color: black;padding-top: 4%; padding-bottom: 4%;border-radius: 5px;">Add Property</a></li>
+              <li><a href="./index.html">Home</a></li>
+              <li><a href="#">About Us</a></li>
+              <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+          </div>
+      </nav>
+<!-- Edit Modal -->
+<!-- property.html -->
+<!-- ... (previous HTML code remains unchanged) -->
+
+<div class="modal" id="editModal">
+    <div class="modal-content">
+      <span class="close" id="editModalCloseBtn">&times;</span>
+      <h2>Edit Property</h2>
+      <form id="editForm">
+        <input type="hidden" id="propertyId" name="propertyId" />
+        <label for="propertyName">Property Name:</label>
+        <input type="text" id="propertyName" name="property_name" required />
+        <label for="propertyType">Property Type:</label>
+        <input type="text" id="propertyType" name="property_type" required />
+        <label for="propertyPrice">Property Price:</label>
+        <input type="number" id="propertyPrice" name="property_price" required />
+        <label for="imageUrl">Image URL:</label>
+        <input type="url" id="imageUrl" name="image_url" required />
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" required />
+        <button type="button" id="saveEditBtn">Save Edit</button>
+      </form>
+    </div>
+  </div>
+  
+  <div class="modal" id="addModal">
+    <div class="modal-content">
+      <span class="close" id="addModalCloseBtn">&times;</span>
+      <h2>Add Property</h2>
+      <form id="addForm">
+        <label for="propertyName">Property Name:</label>
+        <input type="text" id="propertyName" name="property_name" required />
+        <label for="propertyType">Property Type:</label>
+        <input type="text" id="propertyType" name="property_type" required />
+        <label for="propertyPrice">Property Price:</label>
+        <input type="number" id="propertyPrice" name="property_price" required />
+        <label for="imageUrl">Image URL:</label>
+        <input type="url" id="imageUrl" name="image_url" required />
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" required />
+        <button type="submit">Add Property</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- ... (rest of the HTML code remains unchanged) -->
+  
+  
+      <!-- Container to display properties -->
+      <div id="propertyContainer" class="property-grid"></div>
+      
+  <script src="../scripts/property.js"></script>
+</body>
+</html>
+<script>
+  // Function to handle opening the "Add Property" modal
+  function handleAddProperty() {
+    const addModal = document.getElementById('addModal');
+    addModal.style.display = 'block';
+  }
+
+  // Function to close the "Add Property" modal
+  function closeAddModal() {
+    const addModal = document.getElementById('addModal');
+    addModal.style.display = 'none';
+  }
+
+  // Add event listener to "Add Property" button to open the modal
+  const addPropertyBtn = document.getElementById('addPropertyBtn');
+  addPropertyBtn.addEventListener('click', handleAddProperty);
+
+  // Add event listener to the "Close" button inside the modal to close the modal
+  const addModalCloseBtn = document.getElementById('addModalCloseBtn');
+  addModalCloseBtn.addEventListener('click', closeAddModal);
+
+  // Function to handle the form submission for adding a new property
+  function handleAddPropertyFormSubmit(event) {
+    event.preventDefault();
+
+    // Get form data
+    const formData = new FormData(document.getElementById('addForm'));
+    const propertyData = {
+      property_name: formData.get('property_name'),
+      property_type: formData.get('property_type'),
+      property_price: formData.get('property_price'),
+      host_id: localStorage.getItem('hostId'), // Set host_id to the value in localStorage
+      image_url: formData.get('image_url'),
+      location: formData.get('location')
+    };
+
+    // Send a fetch request to create the property
+    fetch('http://127.0.0.1:5000/properties', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(propertyData)
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Check if the response indicates successful creation
+        if (data.message === 'Property created successfully!') {
+          // Property created successfully, close the modal and refresh the property list
+          closeAddModal();
+          showProperties();
+        } else {
+          // If there's an issue with the creation, display an error message
+          const errorContainer = document.getElementById('errorContainer');
+          errorContainer.innerText = 'Error creating property. Please try again later.';
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        // If there's an error with the fetch request, display an error message
+        const errorContainer = document.getElementById('errorContainer');
+        errorContainer.innerText = 'Error creating property. Please try again later.';
+      });
+  }
+
+  // Add event listener to the form submission for adding a new property
+  const addForm = document.getElementById('addForm');
+  addForm.addEventListener('submit', handleAddPropertyFormSubmit);
+</script>

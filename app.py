@@ -69,8 +69,9 @@ def login_host():
             host = cursor.fetchone()
 
             if host:
+                # Assuming host[3] contains the hashed password stored in the database
                 if bcrypt.check_password_hash(host[3], host_password):
-                    return jsonify({"message": "Host login successful!"}), 200
+                    return jsonify({"message": "Host login successful!", "host_id": host[0]}), 200
                 else:
                     return jsonify({"message": "Invalid credentials. Please check your email and password."}), 401
             else:
@@ -102,27 +103,37 @@ def get_all_hosts():
     except mysql.connector.Error as error:
         return "Error while retrieving hosts from MySQL: " + str(error)
 
+# Modify the /hosts/<int:host_id> endpoint to return properties associated with the host
 @app.route('/hosts/<int:host_id>', methods=['GET'])
-def get_host(host_id):
+def get_host_properties(host_id):
     try:
         if connection.is_connected():
             cursor = connection.cursor()
-            query = "SELECT * FROM Hosts WHERE host_id = %s"
+            # Query to retrieve properties associated with the given host ID
+            query = "SELECT * FROM Properties WHERE host_id = %s"
             value = (host_id,)
             cursor.execute(query, value)
-            row = cursor.fetchone()
-            if row:
-                host = {
-                    'host_id': row[0],
-                    'host_name': row[1],
-                    'host_email': row[2],
-                    'host_password': row[3]
+            rows = cursor.fetchall()
+
+            properties = []
+            for row in rows:
+                property_info = {
+                    'property_id': row[0],
+                    'property_name': row[1],
+                    'property_type': row[2],
+                    'property_price': row[3],
+                    'host_id': row[4],
+                    'image_url': row[5],
+                    'location': row[6]
                 }
-                return jsonify(host)
-            else:
-                return "Host not found."
+                properties.append(property_info)
+
+            return jsonify(properties)
+        else:
+            return jsonify({"message": "Error while connecting to the database."}), 500
     except mysql.connector.Error as error:
-        return "Error while retrieving host from MySQL: " + str(error)
+        return jsonify({"message": "Error while retrieving properties from MySQL: " + str(error)}), 500
+
 
 @app.route('/hosts/<int:host_id>', methods=['PUT'])
 def update_host(host_id):
@@ -239,14 +250,18 @@ def get_all_properties():
     except mysql.connector.Error as error:
         return "Error while retrieving properties from MySQL: " + str(error)
 
+# ... (previous backend code remains unchanged)
+
 @app.route('/properties', methods=['POST'])
 def create_property():
-    property_name = request.json['property_name']
-    property_type = request.json['property_type']
-    property_price = request.json['property_price']
-    host_id = request.json['host_id']
-    image_url = request.json['image_url']
-    location = request.json['location']  # Get the location from the request
+    data = request.get_json()
+    property_name = data['property_name']
+    property_type = data['property_type']
+    property_price = data['property_price']
+    host_id = data['host_id']
+    image_url = data['image_url']
+    location = data['location']  # Get the location from the request
+
     try:
         if connection.is_connected():
             cursor = connection.cursor()
@@ -259,6 +274,8 @@ def create_property():
     except mysql.connector.Error as error:
         response_data = {"message": "Error while creating property in MySQL: " + str(error)}
         return jsonify(response_data)  # Send a JSON response
+
+# ... (rest of the backend code remains unchanged)
 
 
 

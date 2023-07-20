@@ -1,0 +1,20 @@
+
+#registerFormContainer,#loginFormContainer{
+
+    font-size: 18px;
+    padding: 2%;
+    width: 40%;
+    margin: auto;
+    background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(243,26,62,1) 100%);
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+}
+
+#btn{
+
+    background-color: black;
+    font-size: 16px;
+ color: white;
+    padding: 2%;
+    border: none;
+    border-radius: 5px;
+}

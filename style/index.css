@@ -1,0 +1,38 @@
+/* Global styles */
+
+
+
+  /* Rest of the previous styles */
+
+/* Rest of the previous styles */
+
+.properties-container {
+    margin-top: 8%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columns in one row */
+    grid-gap: 20px;
+    padding: 20px;
+  }
+  
+  .property-card {
+    /* border: 1px solid #ccc; */
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius: 5px;
+    padding: 10px;
+  }
+  
+  .property-card h3 {
+    margin: 0;
+  }
+  
+  .property-card img {
+    width: 100%; /* Set the image width to 100% of its container (the card) */
+    height: 200px; /* Set a fixed height for the images (adjust as needed) */
+    object-fit: cover; /* Maintain aspect ratio and cover the entire container */
+  }
+  
+  /* ... Other CSS styles ... */
+  
+
+  /* Rest of the previous styles */
+

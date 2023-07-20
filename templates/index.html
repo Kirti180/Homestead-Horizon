@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Property Booking App</title>
+  <link rel="stylesheet" type="text/css" href="../style/index.css">
+  <link rel="stylesheet" type="text/css" href="../style/navbar.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="left-side">
+      <span class="logo">Wanderstay</span>
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search...">
+        <button onclick="performSearch()">Search</button>
+      </div>
+      
+    </div>
+    <div class="right-side">
+      <ul class="nav-links">
+        <li><a href="./index.html">Home</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Hosts</a></li>
+        <li><a href="./register.html">Login</a></li>
+        <li><a href="./register.html">Signup</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Rest of your content goes here -->
+  <div class="properties-container">
+    <!-- Properties will be dynamically added here -->
+  </div>
+ <!-- Host Modal -->
+
+<div class="modal" id="hostModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <center>
+        <h2>Host Login</h2>
+        <form id="hostLoginForm">
+          <label for="hostEmail">Email:</label>
+          <input type="email" id="hostEmail" name="host_email" required placeholder="HostEmail"><br><br> 
+          
+          <label for="hostPassword">Password:</label>
+          <input type="password" id="hostPassword" name="host_password" required placeholder="HostPassword"><br><br>
+    
+          <button type="submit" onclick="loginHost()">Login</button>
+      </center>
+
+      </form>
+    </div>
+  </div>
+  
+  <script src="../scripts/index.js"></script>
+</body>
+</html>
