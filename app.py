@@ -6,7 +6,9 @@ import mysql.connector
 from datetime import datetime
 from flask_bcrypt import Bcrypt
 import json
+import bcrypt
 from flask import jsonify
+from flask_cors import CORS
 bcrypt = Bcrypt()
 
 
@@ -23,6 +25,7 @@ connection = mysql.connector.connect(
 
 
 app = Flask(__name__)
+CORS(app)
 # ===========HOSTS==========
 @app.route('/hosts/register', methods=['POST'])
 def register_host():
@@ -55,7 +58,7 @@ def login_host():
     host_password = data.get('host_password')
 
     if not host_email or not host_password:
-        return "Invalid data. Please provide host_email and host_password.", 400
+        return jsonify({"message": "Invalid data. Please provide host_email and host_password."}), 400
 
     try:
         if connection.is_connected():
@@ -67,13 +70,16 @@ def login_host():
 
             if host:
                 if bcrypt.check_password_hash(host[3], host_password):
-                    return "Host login successful!", 200
+                    return jsonify({"message": "Host login successful!"}), 200
                 else:
-                    return "Invalid credentials. Please check your email and password.", 401
+                    return jsonify({"message": "Invalid credentials. Please check your email and password."}), 401
             else:
-                return "Host not found.", 404
+                return jsonify({"message": "Host not found."}), 404
+        else:
+            return jsonify({"message": "Error while logging in host."}), 500
     except mysql.connector.Error as error:
-        return "Error while logging in host:", str(error), 500
+        return jsonify({"message": "Error while logging in host: " + str(error)}), 500
+
 
 @app.route('/hosts', methods=['GET'])
 def get_all_hosts():
@@ -165,7 +171,8 @@ def get_property(property_id):
                     'property_type': row[2],
                     'property_price': row[3],
                     'host_id': row[4],
-                    'image_url': row[5]  # Add the image_url field
+                    'image_url': row[5],
+                    'location': row[6]  # Added the location field
                 }
                 return jsonify(property_info)
             else:
@@ -179,13 +186,14 @@ def update_property(property_id):
     property_type = request.json.get('property_type')
     property_price = request.json.get('property_price')
     host_id = request.json.get('host_id')
-    image_url = request.json.get('image_url')  # Get the image_url from the request
+    image_url = request.json.get('image_url')
+    location = request.json.get('location')  # Get the location from the request
 
     try:
         if connection.is_connected():
             cursor = connection.cursor()
-            query = "UPDATE Properties SET property_name = %s, property_type = %s, property_price = %s, host_id = %s, image_url = %s WHERE property_id = %s"
-            values = (property_name, property_type, property_price, host_id, image_url, property_id)
+            query = "UPDATE Properties SET property_name = %s, property_type = %s, property_price = %s, host_id = %s, image_url = %s, location = %s WHERE property_id = %s"
+            values = (property_name, property_type, property_price, host_id, image_url, location, property_id)
             cursor.execute(query, values)
             connection.commit()
             return "Property updated successfully!"
@@ -222,7 +230,9 @@ def get_all_properties():
                     'property_name': row[1],
                     'property_type': row[2],
                     'property_price': row[3],
-                    'host_id': row[4]
+                    'host_id': row[4],
+                    'image_url': row[5],
+                    'location': row[6]  # Added the location field
                 }
                 properties.append(property_info)
             return jsonify(properties)
@@ -235,17 +245,20 @@ def create_property():
     property_type = request.json['property_type']
     property_price = request.json['property_price']
     host_id = request.json['host_id']
-    image_url = request.json['image_url']  # Get the image_url from the request
+    image_url = request.json['image_url']
+    location = request.json['location']  # Get the location from the request
     try:
         if connection.is_connected():
             cursor = connection.cursor()
-            query = "INSERT INTO Properties (property_name, property_type, property_price, host_id, image_url) VALUES (%s, %s, %s, %s, %s)"
-            values = (property_name, property_type, property_price, host_id, image_url)
+            query = "INSERT INTO Properties (property_name, property_type, property_price, host_id, image_url, location) VALUES (%s, %s, %s, %s, %s, %s)"
+            values = (property_name, property_type, property_price, host_id, image_url, location)
             cursor.execute(query, values)
             connection.commit()
-            return "Property created successfully!"
+            response_data = {"message": "Property created successfully!"}
+            return jsonify(response_data)  # Send a JSON response
     except mysql.connector.Error as error:
-        return "Error while creating property in MySQL: " + str(error)
+        response_data = {"message": "Error while creating property in MySQL: " + str(error)}
+        return jsonify(response_data)  # Send a JSON response
 
 
 

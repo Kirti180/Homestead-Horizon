@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Host Login</h2>
+<mat-dialog-content>
+  <form #hostForm="ngForm" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+      <input matInput placeholder="Host Email" name="hostEmail" [(ngModel)]="hostEmail" required>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Host Password" name="hostPassword" type="password" [(ngModel)]="hostPassword" required>
+    </mat-form-field><br>
+    <button mat-raised-button color="primary" type="submit" routerLink="/property">Login</button>
+    <button mat-button (click)="onCancel()">Cancel</button>
+  </form>
+</mat-dialog-content>
